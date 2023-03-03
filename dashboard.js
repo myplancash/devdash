@@ -5,7 +5,7 @@ import Today from './components/Today';
 
 const App = () => {
   return (
-    <Today updateInterval={1000}/>
+    <Today updateInterval={90000}/>
   )
 }
 
