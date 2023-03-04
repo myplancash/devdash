@@ -3,6 +3,7 @@ import figlet from 'figlet';
 import useInterval from '@use-it/interval'
 
 import weather from 'weather-js';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 import util from 'util';
 
 
@@ -44,7 +45,7 @@ const useRequest = (promise, options, interval=null) => {
     }
   }, [promise])
 
-  React.useEffect(() => {
+  useDeepCompareEffect(() => {
     request(options);
   }, [options, request])
 
