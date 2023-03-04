@@ -25,21 +25,38 @@ const FONTS = [
 //that will convert the callback style into a async/await promise
 const findWeather = util.promisify(weather.find)
 
-const formatWeather = ([result]) => {
-  const { location, current, forecast } = result;
-  const degreeType =  location.degreetype;
-  const temperature = `${current.temperature}º${degreeType}`
-  const conditions = `${current.skycode}º${degreeType}`
-  const low = `${forecast[1].low}º${degreeType}`
-  const high = `${forecast[1].high}º${degreeType}`
-  
-  return `${temperature} and ${conditions} (${low} -> ${high})`
+//custom react hook
+const useRequest = (promise, options, interval=null) => {
+   const [state, setState] = React.useState({
+    status: 'loading',
+    error: null,
+    data:  null,
+  })
+
+  const request = React.useCallback(async options => {
+    setState({ status: 'loading', error: null, data:  null })
+    let data;
+    try {
+      data = await promise(options)
+      setState({ status: 'complete', error: null, data })
+    } catch(error) {
+      setState({ status: 'error', error: error, data: null })
+    }
+  }, [promise])
+
+  React.useEffect(() => {
+    request(options);
+  }, [options, request])
+
+  useInterval(() => {
+    request(options)
+  }, interval)
+
+  return state
 }
 
-export default function Today({updateInterval=90000, search='Nashville NT', degreeType='F'}) {
-  const [fontIndex, setFontIndex] = React.useState(0)
-  const [now, setNow] = React.useState(new Date())
-  const [weather, setWeather] = React.useState({
+
+ /* const [weather, setWeather] = React.useState({
     status: 'loading',
     error: null,
     data:  null,
@@ -61,6 +78,59 @@ export default function Today({updateInterval=90000, search='Nashville NT', degr
     fetchWeather();
   }, [fetchWeather])
 
+  useInterval(() => {
+    fetchWeather()
+  }, updateInterval) */
+
+const formatWeather = ([ results ]) => {
+  const { location, current, forecast } = results;
+  const degreeType =  location.degreetype;
+  const temperature = `${current.temperature}º${degreeType}`
+  const conditions = current.skytext
+  const low = `${forecast[1].low}º${degreeType}`
+  const high = `${forecast[1].high}º${degreeType}`
+  
+  return `${temperature} and ${conditions} (${low} -> ${high})`
+}
+
+export default function Today({updateInterval=90000, search='Nashville NT', degreeType='F'}) 
+{
+
+  const [fontIndex, setFontIndex] = React.useState(0)
+  const [now, setNow] = React.useState(new Date())
+  const options = React.useMemo(() => ({search, degreeType}), [search, degreeType])
+  const weather = useRequest(
+    findWeather,
+    options,
+    updateInterval
+  )
+
+ /*  const [weather, setWeather] = React.useState({
+    status: 'loading',
+    error: null,
+    data:  null,
+  })
+
+  //we use useCallback bcause dont' want to keep getting a new instace of it 
+  const fetchWeather = React.useCallback(async () => {
+    setWeather({ status: 'loading', error: null, data:  null })
+    let data;
+    try {
+      data = await findWeather({ search, degreeType })
+      setWeather({ status: 'complete', error: null, data })
+    } catch(error) {
+      setWeather({ status: 'error', error: error, data: null })
+    }
+  }, [search, degreeType])
+
+  React.useEffect(() => {
+    fetchWeather();
+  }, [fetchWeather])
+
+  useInterval(() => {
+    fetchWeather()
+  }, updateInterval)
+ */
   useInterval(() => {
     setNow(new Date())
   }, 60000) // every 1 minute
