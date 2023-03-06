@@ -6,7 +6,6 @@ import weather from 'weather-js';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import util from 'util';
 
-
 //convert from a callback way to a promise with Async/await
 const FONTS = [
   "Straight", 
@@ -55,7 +54,6 @@ const useRequest = (promise, options, interval=null) => {
 
   return state
 }
-
 
  /* const [weather, setWeather] = React.useState({
     status: 'loading',
@@ -106,32 +104,6 @@ export default function Today({updateInterval=90000, search='Nashville NT', degr
     updateInterval
   )
 
- /*  const [weather, setWeather] = React.useState({
-    status: 'loading',
-    error: null,
-    data:  null,
-  })
-
-  //we use useCallback bcause dont' want to keep getting a new instace of it 
-  const fetchWeather = React.useCallback(async () => {
-    setWeather({ status: 'loading', error: null, data:  null })
-    let data;
-    try {
-      data = await findWeather({ search, degreeType })
-      setWeather({ status: 'complete', error: null, data })
-    } catch(error) {
-      setWeather({ status: 'error', error: error, data: null })
-    }
-  }, [search, degreeType])
-
-  React.useEffect(() => {
-    fetchWeather();
-  }, [fetchWeather])
-
-  useInterval(() => {
-    fetchWeather()
-  }, updateInterval)
- */
   useInterval(() => {
     setNow(new Date())
   }, 60000) // every 1 minute
